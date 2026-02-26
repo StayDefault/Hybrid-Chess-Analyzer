@@ -77,7 +77,7 @@ bash
 python app.py
 visit http://localhost:7860
 
-## 📖 User Guide
+##  User Guide
 ### FEN Analysis Mode
 1. Paste a FEN string
 
