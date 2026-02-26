@@ -1,88 +1,183 @@
-# Hybrid Chess Analyzer
+# ♟️ Hybrid Chess Analyzer
 
-一个混合式国际象棋分析系统，结合Stockfish引擎和OpenAI GPT，提供智能化的棋局分析。
+A hybrid chess analysis system that combines the power of **Stockfish** with **Google Gemini** to provide intelligent position evaluation, natural-language interaction, and an intuitive visual interface.
 
-## ✨ 功能特点
+---
 
-### 📊 FEN分析模式
-- 输入FEN格式的棋盘位置
-- 实时可视化棋盘显示
-- 获取最佳走法和评估值
-- 支持常用开局示例
+## 📌 Overview
 
-### 💬 AI对话模式
-- 自然语言对话式下棋
-- 自动跟踪棋盘状态
-- 智能分析局势
-- 支持多种棋局指令
+Hybrid Chess Analyzer is designed for players, developers, and chess enthusiasts who want:
 
-## 🚀 快速开始
+- 🔍 Accurate engine analysis  
+- 💬 Natural language chess interaction  
+- 📊 Visual board feedback  
+- 🧠 AI-assisted understanding of positions  
 
-### 1. 安装依赖
+The system merges classical engine strength with modern LLM reasoning to create a smarter chess analysis experience.
+
+---
+
+## ✨ Features
+
+### 📊 FEN Analysis Mode
+
+- Paste any FEN position
+- Real-time visual chessboard
+- Best move suggestions from Stockfish
+- Position evaluation (centipawn / mate)
+- Built-in opening examples
+
+---
+
+### 💬 AI Chat Mode
+
+- Play chess via natural language
+- Automatic board tracking
+- Ask positional questions
+- Flexible chess commands
+- Context-aware analysis
+
+Example interactions:
+I play e4,
+Opponent plays c5,
+Who is better?
+Analyze the position
+Restart the game
+
+
+---
+
+## 🚀 Quick Start
+
+### 1️. Clone the Repository
+
+```bash
+git clone https://github.com/StayDefault/Hybrid-Chess-Analyzer.git
+cd Hybrid-Chess-Analyzer
+```
+
+### 1. Install Dependencies
 ```bash
 pip install -r requirements.txt
-
-### 2. 配置环境变量
-复制 .env.example 为 .env 并填写配置：
+```
+### 2. Configure Environment Variables
+copy .env and example edit .env and fill in：
 
 ```text
 OPENAI_API_KEY=your-api-key
 STOCKFISH_PATH=./engines/stockfish/stockfish-windows-x86-64-avx2.exe
-
-### 3. 下载Stockfish引擎
-从 Stockfish官网 下载对应系统的引擎文件，
-放入 engines/stockfish/ 目录。
-
-### 4. 运行程序
+```
+### 3. Download Stockfish Engine
+Download the correct binary for your OS from the official Stockfish website and place it into:
+```text
+engines/stockfish/
+```
+### 4. Run the Program
 bash
 python app.py
-访问 http://localhost:7860
+visit http://localhost:7860
 
-## 📖 使用指南
-### FEN分析模式
-在输入框粘贴FEN字符串
+## 📖 User Guide
+### FEN Analysis Mode
+1. Paste a FEN string
 
-点击"分析位置"按钮
+2. Click Analyze Position
 
-查看最佳走法和评估值
+3. View best move and evaluation
 
-### AI对话模式
-支持的自然语言指令：
+### AI Chat Mode
+Make moves
 
-走棋：我走e4、对手e5
+I play e4
+Black plays e5
 
-分析：谁优势？、分析局面
+Ask for analysis
 
-重置：重新开始
+Who is winning?
+Evaluate this position
 
-## 🏗️ 项目结构
+Reset game
+
+Restart
+New game
+
+## 🏗️ Project Structure
 ```text
 Hybrid_Chess_Analyzer/
-├── app.py                 # 主程序入口
-├── chess_core/            # 核心引擎模块
-├── sessions/              # 会话管理模块
-├── llm/                   # AI对话模块
-├── ui/                    # 界面模块
-└── engines/               # 引擎文件
+├── app.py                 # Main application entry
+├── chess_core/            # Core engine module
+│   ├── engine.py
+│   ├── utils.py
+│   └── __init__.py
+├── sessions/              # Session management
+├── llm/                   # AI conversation module
+├── ui/                    # User interface
+├── engines/               # Stockfish binaries (not included)
+├── requirements.txt
+├── .env.example
+└── README.md
+```
 
+## ⚙️ Requirements
 
-## 📝 许可证
-MIT License
-
-``` text
+- Python 3.9+
+- Stockfish engine
+- OpenAI / Gemini API access
+- Modern web browser
 
 ---
 
-## **chess_core/ 模块**
+## 🛠️ Troubleshooting
 
-### **chess_core/__init__.py**
-```python
-"""
-Chess Core Module
-提供国际象棋引擎核心功能
-"""
+### ❗ Stockfish not found
 
-from .engine import StockfishEngine
-from .utils import validate_fen, fen_to_board, get_game_phase
+Make sure:
 
-__all__ = ['StockfishEngine', 'validate_fen', 'fen_to_board', 'get_game_phase']
+- The binary exists  
+- The path in `.env` is correct  
+- The file has execute permission (Linux/macOS)
+
+---
+
+### ❗ Port already in use
+
+Change the port in `app.py` or stop the conflicting process.
+
+---
+
+## 🔮 Roadmap
+
+- [ ] PGN import support  
+- [ ] Opening explorer  
+- [ ] Multi-engine comparison  
+- [ ] Cloud deployment guide  
+- [ ] Mobile-friendly UI  
+
+---
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome.
+
+1. Fork the repo  
+2. Create your feature branch  
+3. Commit your changes  
+4. Open a Pull Request  
+
+---
+
+## 📜 License
+
+This project is licensed under the **MIT License**.
+
+---
+
+## ⭐ Acknowledgements
+
+- Stockfish team  
+- Google Gemini  
+- Python chess community  
+
+---
+
+**If you find this project useful, consider giving it a star ⭐**
