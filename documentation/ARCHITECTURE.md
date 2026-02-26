@@ -42,72 +42,26 @@ Hybrid_Chess_Analyzer/
 -   Framework: Gradio 4.8.0
 -   Components:
    -   Chat interface with message history
+   -   ractive chess board visualization
+   -   FEN input with validation
+   -   Analysis results display
+   -   Session state management
+-    Key Files: ui/fen_tab.py, ui/chat_tab.py, ui/components.py
 
-Interactive chess board visualization
+### Backend
+-    Framework: Python 3.9 with Gradio server
+-    Architecture: Modular, clean architecture with separation of concerns
+-    Core Modules:
+    -    app.py: Main orchestrator, tab creation
+    -    chess_core/: Chess engine abstraction
+    -    sessions/: State management
+    -    llm/: AI integration
 
-FEN input with validation
-
-Analysis results display
-
-Session state management
-
-Key Files: ui/fen_tab.py, ui/chat_tab.py, ui/components.py
-
-Backend
-Framework: Python 3.9 with Gradio server
-
-Architecture: Modular, clean architecture with separation of concerns
-
-Core Modules:
-
-app.py: Main orchestrator, tab creation
-
-chess_core/: Chess engine abstraction
-
-sessions/: State management
-
-llm/: AI integration
-
-Database
-Type: In-memory only (no persistent database)
-
-Session Storage: Python dictionary with timeout-based cleanup
-
-Future Consideration: Redis for distributed sessions
-
-ORM
-None: Not required for current scope
-
-Uses python-chess objects directly
-
-Authentication
-Current: No authentication (local development)
-
-Future: API key validation for production deployment
-
-AI Integration
-Provider: Google Gemini 1.5 (Pro and Flash models)
-
-SDK: google-genai 0.1.0
-
-Features:
-
-Natural language understanding
-
-Function calling simulation via JSON
-
-Multiple tool call handling
-
-Conversational responses
-## 4. Data Flow
-   - 关键业务流程的数据走向（时序/流程图）
-   - 请求流 + 异步任务流 + AI 流（如有）
-## 5. Design Principles
-   - SOLID、DRY、依赖注入、Clean Architecture
-## 6. Environment & Configuration
-## 7. Deployment & Infrastructure
-## 8. Testing Strategy
-## 9. Performance Considerations
-## 10. Security Practices
-## 11. Future Improvements
-## 12. Revision History
+### AI Integration
+-    Provider: Google Gemini 1.5 (Pro and Flash models)
+-    SDK: google-genai 0.1.0
+-    Features:
+    -    Natural language understanding
+    -    Function calling simulation via JSON
+    -    Multiple tool call handling
+    -    Conversational responses
