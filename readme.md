@@ -1,25 +1,25 @@
-# ♟️ Hybrid Chess Analyzer
+#  Hybrid Chess Analyzer
 
 A hybrid chess analysis system that combines the power of **Stockfish** with **Google Gemini** to provide intelligent position evaluation, natural-language interaction, and an intuitive visual interface.
 
 ---
 
-## 📌 Overview
+##  Overview
 
 Hybrid Chess Analyzer is designed for players, developers, and chess enthusiasts who want:
 
-- 🔍 Accurate engine analysis  
-- 💬 Natural language chess interaction  
-- 📊 Visual board feedback  
-- 🧠 AI-assisted understanding of positions  
+-  Accurate engine analysis  
+-  Natural language chess interaction  
+-  Visual board feedback  
+-  AI-assisted understanding of positions  
 
 The system merges classical engine strength with modern LLM reasoning to create a smarter chess analysis experience.
 
 ---
 
-## ✨ Features
+##  Features
 
-### 📊 FEN Analysis Mode
+###  FEN Analysis Mode
 
 - Paste any FEN position
 - Real-time visual chessboard
@@ -29,7 +29,7 @@ The system merges classical engine strength with modern LLM reasoning to create 
 
 ---
 
-### 💬 AI Chat Mode
+###  AI Chat Mode
 
 - Play chess via natural language
 - Automatic board tracking
@@ -47,7 +47,7 @@ Restart the game
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### 1️. Clone the Repository
 
@@ -101,7 +101,7 @@ Reset game
 Restart
 New game
 
-## 🏗️ Project Structure
+##  Project Structure
 ```text
 Hybrid_Chess_Analyzer/
 ├── app.py                 # Main application entry
@@ -118,7 +118,7 @@ Hybrid_Chess_Analyzer/
 └── README.md
 ```
 
-## ⚙️ Requirements
+##  Requirements
 
 - Python 3.9+
 - Stockfish engine
@@ -127,9 +127,9 @@ Hybrid_Chess_Analyzer/
 
 ---
 
-## 🛠️ Troubleshooting
+##  Troubleshooting
 
-### ❗ Stockfish not found
+###  Stockfish not found
 
 Make sure:
 
@@ -139,13 +139,13 @@ Make sure:
 
 ---
 
-### ❗ Port already in use
+###  Port already in use
 
 Change the port in `app.py` or stop the conflicting process.
 
 ---
 
-## 🔮 Roadmap
+##  Roadmap
 
 - [ ] PGN import support  
 - [ ] Opening explorer  
@@ -155,7 +155,7 @@ Change the port in `app.py` or stop the conflicting process.
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions, issues, and feature requests are welcome.
 
@@ -166,13 +166,13 @@ Contributions, issues, and feature requests are welcome.
 
 ---
 
-## 📜 License
+##  License
 
 This project is licensed under the **MIT License**.
 
 ---
 
-## ⭐ Acknowledgements
+##  Acknowledgements
 
 - Stockfish team  
 - Google Gemini  
@@ -180,4 +180,4 @@ This project is licensed under the **MIT License**.
 
 ---
 
-**If you find this project useful, consider giving it a star ⭐**
+**If you find this project useful, consider giving it a star **
