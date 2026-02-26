@@ -1,14 +1,16 @@
 """
 对话模式标签页
-功能：通过自然语言对话方式下棋和分析
 """
 
 import gradio as gr
 import json
 import os
 import chess
+from typing import List, Dict, Any, Optional
+
+# 确保这些导入路径正确
 from sessions.manager import session_manager
-from llm.client import llm_client
+from llm.gemini_client import gemini_client  # 确保这行正确
 from llm.tools import tools
 from llm.prompts import get_analysis_prompt
 from ui.components import render_board
@@ -17,8 +19,7 @@ from chess_core.engine import get_engine
 
 def process_chat_message(message, session_id="default"):
     """
-    处理用户的自然语言输入
-    返回机器人回复
+    处理用户的自然语言输入（使用Gemini）
     """
     if not message or message.strip() == "":
         return "请输入消息..."
@@ -29,99 +30,87 @@ def process_chat_message(message, session_id="default"):
     current_turn = "白方" if session.board.turn == chess.WHITE else "黑方"
     
     try:
-        # 调用OpenAI解析用户意图
-        response = llm_client.chat_completion(
+        # 构建提示词
+        system_prompt = f"""
+        你是一个国际象棋助手。当前棋盘FEN: {current_fen}
+        轮到：{current_turn}
+        走法历史：{session.get_status()['history']}
+        
+        可用工具：
+        {json.dumps(tools, ensure_ascii=False, indent=2)}
+        
+        请分析用户输入，如果需要调用工具，以JSON格式返回：
+        {{"tool": "工具名", "parameters": {{...}}}}
+        
+        否则直接回复用户。
+        """
+        
+        # 调用Gemini
+        response = gemini_client.chat_completion(
             messages=[
-                {"role": "system", "content": f"""
-                你是一个国际象棋助手。当前棋盘FEN: {current_fen}
-                轮到：{current_turn}
-                走法历史：{session.get_status()['history']}
-                
-                你的任务：
-                1. 如果用户描述了一个走法（如"我走e4"），调用 make_move
-                2. 如果用户问关于局势的问题（如"谁优势"），调用 analyze_position
-                3. 如果用户想重新开始，调用 reset_board
-                4. 如果用户描述多个走法，依次调用 make_move
-                
-                用友好的语气回复，解释你做了什么。
-                """},
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": message}
             ],
-            tools=tools
+            tools=tools,
+            temperature=0.3
         )
         
         response_message = response.choices[0].message
         
         # 处理函数调用
-        if response_message.tool_calls:
+        tool_call = gemini_client.parse_function_call(response)
+        
+        if tool_call:
             results = []
+            function_name = tool_call["name"]
+            function_args = tool_call["arguments"]
             
-            for tool_call in response_message.tool_calls:
-                function_name = tool_call.function.name
-                function_args = json.loads(tool_call.function.arguments) if tool_call.function.arguments else {}
+            # 执行对应的函数
+            if function_name == "make_move":
+                result = session.make_move(function_args["move"])
+                results.append(result)
                 
-                # 执行对应的函数
-                if function_name == "make_move":
-                    result = session.make_move(function_args["move"])
-                    results.append(result)
-                    
-                elif function_name == "analyze_position":
-                    # 调用引擎分析
-                    engine = get_engine()
-                    engine_result = engine.analyze_position(session.board.fen())
-                    session.last_analysis = engine_result
-                    results.append(engine_result)
-                    
-                elif function_name == "reset_board":
-                    result = session.reset()
-                    results.append({"message": result["message"]})
-                    
-                elif function_name == "get_move_history":
-                    history = session.get_move_history()
-                    results.append({"history": history})
-                    
-                elif function_name == "explain_position":
-                    results.append({"message": "正在分析局势..."})
+            elif function_name == "analyze_position":
+                # 调用引擎分析
+                engine = get_engine()
+                engine_result = engine.analyze_position(session.board.fen())
+                session.last_analysis = engine_result
+                results.append(engine_result)
+                
+            elif function_name == "reset_board":
+                result = session.reset()
+                results.append({"message": result["message"]})
+                
+            elif function_name == "get_move_history":
+                history = session.get_move_history()
+                results.append({"history": history})
             
             # 生成自然语言回复
-            return generate_chat_response(message, session, results)
+            return generate_chat_response(message, session, results, response_message.content)
         else:
-            # 没有函数调用，可能是普通对话
-            return handle_general_chat(message, session)
+            # 没有函数调用，返回直接回复
+            return response_message.content
             
     except Exception as e:
         return f"处理出错: {str(e)}。请重试。"
 
 
-def generate_chat_response(original_message, session, results):
+def generate_chat_response(original_message, session, results, ai_suggestion=""):
     """生成自然语言回复"""
     status = session.get_status()
     
-    # 构建回复提示词
-    prompt = get_analysis_prompt(original_message, status, results)
+    # 如果有AI建议，直接使用
+    if ai_suggestion:
+        return ai_suggestion
     
-    try:
-        response = llm_client.chat_completion(
-            messages=[
-                {"role": "system", "content": "你是国际象棋助手，语气友好专业。"},
-                {"role": "user", "content": prompt}
-            ],
-            model=os.getenv("OPENAI_MODEL_CHEAP", "gpt-3.5-turbo"),
-            temperature=0.5,
-            max_tokens=300
-        )
-        
-        return response.choices[0].message.content
-        
-    except Exception as e:
-        # 降级回复
-        if results and "best_move" in results[0]:
-            r = results[0]
-            return f"分析完成！推荐走法：{r['best_move']}，评估：{r['evaluation']}。当前{status['status']}，轮到{status['turn']}。"
-        elif results and "move" in results[0] and results[0].get("success"):
-            return f"已记录 {results[0]['move']}。当前{status['status']}，轮到{status['turn']}。"
-        else:
-            return f"当前轮到{status['turn']}，{status['status']}。你想怎么走？"
+    # 否则生成简单回复
+    if results and "best_move" in results[0]:
+        r = results[0]
+        return f"分析完成！推荐走法：{r['best_move']}，评估：{r['evaluation']}。当前{status['status']}，轮到{status['turn']}。"
+    elif results and "move" in results[0] and results[0].get("success"):
+        return f"已记录 {results[0]['move']}。当前{status['status']}，轮到{status['turn']}。"
+    else:
+        return f"当前轮到{status['turn']}，{status['status']}。你想怎么走？"
 
 
 def handle_general_chat(message, session):
@@ -136,19 +125,16 @@ def handle_general_chat(message, session):
     - 状态：{status['status']}
     - 走法历史：{status['history']}
     
-    请以国际象棋助手的身份友好回复。可以：
-    - 如果用户问问题，回答国际象棋相关知识
-    - 如果用户没指定动作，询问是想走棋还是分析
-    - 保持对话自然
+    请以国际象棋助手的身份友好回复。
     """
     
     try:
-        response = llm_client.chat_completion(
+        response = gemini_client.chat_completion(
             messages=[
                 {"role": "system", "content": "你是国际象棋助手。"},
                 {"role": "user", "content": prompt}
             ],
-            model="gpt-3.5-turbo",
+            model="gemini-1.5-flash",
             temperature=0.7,
             max_tokens=200
         )
@@ -374,12 +360,12 @@ def create_chat_tab():
         )
         
         # 初始加载
-        demo.load(
-            update_chat_display,
-            [session_id],
-            [chat_board, chat_turn, chat_status, chat_fen, 
-             chat_history_moves, material_balance, legal_moves]
-        )
+        #demo.load(
+        #    update_chat_display,
+        #    [session_id],
+        #    [chat_board, chat_turn, chat_status, chat_fen, 
+        #     chat_history_moves, material_balance, legal_moves]
+        #)
         
         # 帮助信息
         with gr.Accordion("❓ 使用说明", open=False):
